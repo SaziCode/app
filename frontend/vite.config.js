@@ -6,14 +6,11 @@ export default defineConfig({
   build: {
     outDir: 'dist', // вихідна директорія
     assetsDir: 'assets',
-    rollupOptions: {
-      input: './public/index.html', // явно вказуємо на index.html
-    },
   },
   server: {
-    port: 4000,  // Порт для фронтенду
+    port: 4000,
     proxy: {
-      '/api': 'http://localhost:3000',  // Проксі для запитів до бекенду
+      '/api': 'http://localhost:3000',
     },
   },
 });

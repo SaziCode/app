@@ -1,93 +1,102 @@
-const express = require("express");
-const bcrypt = require('bcryptjs');
+const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const db = require('../models/db');
 
-const jwt = require("jsonwebtoken");
-const db = require("../models/db"); // Підключення до бази
 const router = express.Router();
+const SECRET_KEY = 'your_secret_key';
 
-const SECRET_KEY = "your_secret_key"; // Ключ для JWT
-
-// Реєстрація користувача
-router.post("/register", async (req, res) => {
+// Реєстрація
+router.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-        return res.status(400).json({ message: "Усі поля обов'язкові!" });
-    }
+    console.log('Received data:', req.body);
 
     try {
+        const result = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        console.log('Query result:', result);
+
+        // Перевірка результату запиту
+		
+        
+        const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+		console.log('Existing user:', existingUser);
+		
+		if (existingUser && existingUser.length > 0) {
+			return res.status(400).json({ message: 'Користувач з такою поштою вже існує' });
+		}
+		
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        await db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, hashedPassword]);
-        res.json({ message: "Користувача створено!" });
+        await db.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hashedPassword]);
+
+        res.status(201).json({ message: 'Реєстрація успішна' });
     } catch (error) {
-        res.status(500).json({ message: "Помилка сервера!" });
+        console.error('Server error during registration:', error);
+        res.status(500).json({ message: 'Помилка сервера', error: error.message });
     }
 });
 
-// Авторизація користувача
-router.post("/login", async (req, res) => {
+
+// Перевірка статусу користувача (чи увійшов він)
+router.get('/status/:email', (req, res) => {
+    const { email } = req.params;
+
+    if (loggedInUsers.has(email)) {
+        return res.status(200).json({ loggedIn: true, message: 'Користувач уже увійшов' });
+    } else {
+        return res.status(200).json({ loggedIn: false, message: 'Користувач не увійшов' });
+    }
+});
+
+// Логін
+const loggedInUsers = new Set(); // Збереження залогінених користувачів
+
+// Логін
+// Логін
+router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ message: "Усі поля обов'язкові!" });
-    }
+    
+    console.log('Login request received:', req.body); // Логування отриманих даних
 
     try {
-        const [user] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-
+        // Виконуємо запит до бази даних для отримання користувача за email
+        const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        
+        // Перевірка, чи знайдений користувач
         if (!user) {
-            return res.status(401).json({ message: "Користувача не знайдено!" });
+            console.log('No user found with this email');  // Логування, якщо користувача не знайдено
+            return res.status(400).json({ message: 'Невірна пошта або пароль' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Невірний пароль!" });
+        console.log('User found:', user); // Логування знайденого користувача
+
+        // Перевірка, чи існує пароль у знайденого користувача
+        if (!user.password) {
+            console.log('Password field is missing for user'); // Логування, якщо немає пароля
+            return res.status(400).json({ message: 'Невірна пошта або пароль' });
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: "1h" });
+        // Перевірка пароля
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            console.log('Incorrect password'); // Логування, якщо пароль невірний
+            return res.status(400).json({ message: 'Невірна пошта або пароль' });
+        }
 
-        res.json({ message: "Успішний вхід!", token });
+        // Генерація токену
+        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+
+        console.log('Login successful, token generated'); // Логування успішного входу
+
+        // Відправлення відповіді з токеном
+        res.status(200).json({ message: 'Вхід успішний', token });
     } catch (error) {
-        res.status(500).json({ message: "Помилка сервера!" });
+        console.error('Login error:', error); // Логування помилок
+        res.status(500).json({ message: 'Помилка сервера', error: error.message });
     }
 });
 
-// GET /auth/profile — Отримання профілю користувача
-router.get("/profile", async (req, res) => {
-    // Отримуємо токен із заголовка
-    const token = req.headers.authorization?.split(" ")[1];
 
-    if (!token) {
-        return res.status(401).json({ message: "Вам потрібно увійти!" });
-    }
 
-    try {
-        // Перевіряємо токен
-        const decoded = jwt.verify(token, SECRET_KEY);
-
-        // Отримуємо дані користувача за ID
-        const [user] = await db.query("SELECT id, name, email FROM users WHERE id = ?", [decoded.id]);
-
-        if (!user) {
-            return res.status(404).json({ message: "Користувача не знайдено!" });
-        }
-
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: "Помилка перевірки токена!" });
-    }
-});
-
-// GET /auth/logout — Вихід з системи
-router.get("/logout", (req, res) => {
-    // Видаляємо сесію
-    req.session.destroy(err => {
-        if (err) {
-            return res.status(500).json({ message: "Помилка при виході!" });
-        }
-
-        res.json({ message: "Вихід успішний!" });
-    });
-});
 
 module.exports = router;
