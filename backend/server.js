@@ -19,10 +19,6 @@ app.use(bodyParser.json());
 
 // Використовуємо маршрути
 app.use('/api', goalsRoutes); // Усі маршрути будуть доступні з префіксом /api
-app.use('/api/goals', goalsRoutes); // Маршрут для goals
-app.use('/api/activity', goalsRoutes); // Маршрут для activity
-app.use('/api/users', goalsRoutes); // Маршрут для users
-
 app.use('/api/auth', authRoutes);
 
 app.use(session({

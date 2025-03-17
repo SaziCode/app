@@ -1,6 +1,24 @@
+//D:\ospanel\OSPanel\domains\pwa_goal_planner\backend\routes\goalRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const { query } = require('../models/db'); // Імпортуємо query з модуля db
+
+
+const { generateTasks, saveTasks, addGoal } = require("../controllers/goalController");
+
+
+// Додавання цілі
+router.post("/goals", addGoal);
+
+// Генерація підзадач
+router.post("/generate-tasks", generateTasks);
+// Збереження задач
+router.post("/tasks", saveTasks); // Додайте цей маршрут
+
+
+
+
 
 // Отримання активних цілей
 router.get('/goals', async (req, res) => {

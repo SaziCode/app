@@ -20,6 +20,7 @@ const Home = () => {
 
     return (
         <div>
+			<p>Не має акаунта? <a href="/addgoal">Зареєструватись</a></p>
             <h1>Планування цілей</h1>
             <ActiveGoals />
             <Activity />
