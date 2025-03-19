@@ -4,9 +4,10 @@ const cors = require('cors');
 const session = require('express-session');
 const authRoutes = require('./routes/authRoutes');
 const goalsRoutes = require('./routes/goalRoutes');
-
+const path = require('path');
 const bodyParser = require('body-parser');
-
+const { verifyToken } = require('./middleware/authMiddleware');
+require('dotenv').config();
 // Налаштовуємо CORS
 app.use(cors({
     origin: '*', // Замінити на правильний домен
@@ -16,6 +17,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(bodyParser.json());
+
+
 
 // Використовуємо маршрути
 app.use('/api', goalsRoutes); // Усі маршрути будуть доступні з префіксом /api
@@ -27,7 +30,11 @@ app.use(session({
     saveUninitialized: true
 }));
 
-app.use('/auth', authRoutes); // Використання маршруту авторизації
+// Вказуємо директорію для статичних файлів
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+// Використання маршруту авторизації
+app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

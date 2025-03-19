@@ -1,32 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const Activity = () => {
-    const [activity, setActivity] = useState([]);
+const Activity = ({ userId }) => {
+  const [activity, setActivity] = useState([]);
 
-    useEffect(() => {
-        fetch('http://localhost:3000/api/activity') // API для отримання активності
-            .then(response => response.json())
-            .then(data => setActivity(data))
-            .catch(error => console.error('Error fetching activity:', error));
-    }, []);
+  useEffect(() => {
+    axios.get(`http://localhost:3000/api/activity-graph`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    .then(response => {
+      setActivity(response.data);
+    })
+    .catch(error => {
+      console.error('Помилка при отриманні графіку активності:', error);
+    });
+  }, [userId]);
 
-    return (
-        <div>
-            <h2>Активність</h2>
-            <ul>
-                {activity.length > 0 ? (
-                    activity.map((item, index) => (
-                        <li key={index}>
-                            Місяць: {item.month}, Користувач: {item.user_name}, Ціль: {item.goal_title}, 
-                            Середній прогрес: {item.average_progress}%
-                        </li>
-                    ))
-                ) : (
-                    <li>Немає активності для відображення.</li>
-                )}
-            </ul>
-        </div>
-    );
+  return (
+    <div>
+      <h2>Графік активності</h2>
+      <ul>
+        {activity.map((item, index) => (
+          <li key={index}>{item.month}: {item.completed_tasks} завдань</li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default Activity;

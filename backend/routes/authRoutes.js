@@ -52,46 +52,47 @@ router.get('/status/:email', (req, res) => {
 const loggedInUsers = new Set(); // Збереження залогінених користувачів
 
 // Логін
-// Логін
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    
-    console.log('Login request received:', req.body); // Логування отриманих даних
+
+    console.log('Login request received:', req.body);
 
     try {
-        // Виконуємо запит до бази даних для отримання користувача за email
-        const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-        
-        // Перевірка, чи знайдений користувач
-        if (!user) {
-            console.log('No user found with this email');  // Логування, якщо користувача не знайдено
+        // Виконуємо запит до бази
+        const users = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+
+        console.log('Database query result:', users); // Додаємо логування
+
+        // Перевіряємо, чи знайдено користувача
+        if (!users || users.length === 0) {
+            console.log('No user found with this email');
             return res.status(400).json({ message: 'Невірна пошта або пароль' });
         }
 
-        console.log('User found:', user); // Логування знайденого користувача
+        const user = Array.isArray(users) ? users[0] : users; // Виправлення тут!
 
-        // Перевірка, чи існує пароль у знайденого користувача
+        console.log('User found:', user);
+
         if (!user.password) {
-            console.log('Password field is missing for user'); // Логування, якщо немає пароля
-            return res.status(400).json({ message: 'Невірна пошта або пароль' });
+            console.log('User password is missing in DB');
+            return res.status(500).json({ message: 'Помилка сервера: відсутній пароль' });
         }
 
         // Перевірка пароля
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            console.log('Incorrect password'); // Логування, якщо пароль невірний
+            console.log('Incorrect password');
             return res.status(400).json({ message: 'Невірна пошта або пароль' });
         }
 
-        // Генерація токену
+        // Генерація JWT
         const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+		console.log('JWT_SECRET:', process.env.JWT_SECRET);
+        console.log('Login successful, token generated');
 
-        console.log('Login successful, token generated'); // Логування успішного входу
-
-        // Відправлення відповіді з токеном
         res.status(200).json({ message: 'Вхід успішний', token });
     } catch (error) {
-        console.error('Login error:', error); // Логування помилок
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Помилка сервера', error: error.message });
     }
 });
