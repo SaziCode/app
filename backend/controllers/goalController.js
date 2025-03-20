@@ -6,6 +6,23 @@ require("dotenv").config();
 const { query } = require("../models/db");
 const axios = require("axios");
 
+async function getAllGoals(req, res) {
+    try {
+      const userId = req.user.id; // Отримуємо ID користувача з токена
+      const goals = await db.query(
+        `SELECT id, title, progress, status, start_date, deadline
+         FROM goals
+         WHERE user_id = ?`,
+        [userId]
+      );
+  
+      res.json(goals);
+    } catch (error) {
+      console.error("Помилка при отриманні завдань:", error);
+      res.status(500).json({ message: "Помилка сервера" });
+    }
+  }
+
 // Отримання активних цілей
 async function getActiveGoals(req, res) {
     try {
@@ -39,7 +56,7 @@ async function getTotalTimeForGoal(req, res) {
         const { goalId } = req.params;
 
         const [result] = await db.query(`
-            SELECT COALESCE(SUM(hours), 0) AS total_hours
+            SELECT COALESCE(SUM(hours), 0) AS totalTime
             FROM activity
             WHERE goal_id = ?
         `, [goalId]);
@@ -48,7 +65,7 @@ async function getTotalTimeForGoal(req, res) {
             return res.status(404).json({ message: 'Дані не знайдено' });
         }
 
-        res.json({ total_hours: Number(result.total_hours) }); // Перетворюємо на число
+        res.json({ totalTime: Number(result.totalTime) }); // Повертаємо totalTime як число
     } catch (error) {
         console.error("Помилка отримання загального часу для мети:", error);
         res.status(500).json({ message: "Помилка сервера" });
@@ -77,36 +94,34 @@ async function getReminders(req, res) {
 // Отримання графіку активності користувача
 async function getActivityData(req, res) {
     try {
+        const { goalId } = req.query; // Отримуємо goalId з параметрів запиту
+
         const activityData = await db.query(`
             SELECT 
-			
                 MONTH(a.date) AS month, 
                 YEAR(a.date) AS year,
-				SUM(a.hours) AS total_hours,
+                SUM(a.hours) AS total_hours,
                 SUM(a.progress) AS total_progress,
                 SUM(a.progress) - LAG(SUM(a.progress)) OVER (ORDER BY YEAR(a.date), MONTH(a.date)) AS progress_difference
             FROM activity a
-            WHERE a.user_id = ? AND a.date >= DATE_SUB(NOW(), INTERVAL 8 MONTH)
+            WHERE a.goal_id = ? AND a.date >= DATE_SUB(NOW(), INTERVAL 8 MONTH)
             GROUP BY YEAR(a.date), MONTH(a.date)
             ORDER BY YEAR(a.date), MONTH(a.date)
-        `, [req.user.id]);
+        `, [goalId]);
 
-        // Перевірка, чи є дані масивом
         if (!activityData || !Array.isArray(activityData)) {
             return res.status(404).json({ message: 'Дані активності не знайдено' });
         }
-	
 
-        // Форматуємо дані для зручності
         const formattedData = activityData.map((item) => ({
             month: item.month,
             year: item.year,
-			total_hours: item.total_hours,
+            total_hours: item.total_hours,
             total_progress: item.total_progress,
             progress_difference: item.progress_difference || 0, // Якщо немає попереднього місяця, різниця = 0
         }));
 
-        res.json(formattedData, );
+        res.json(formattedData);
     } catch (error) {
         console.error('Помилка отримання даних активності:', error);
         res.status(500).json({ message: 'Помилка сервера' });
@@ -134,6 +149,26 @@ async function getTotalProgressForGoal(req, res) {
     }
 }
 
+async function getLastUpdateForGoal(req, res) {
+    try {
+        const { goalId } = req.query;
+
+        const [result] = await db.query(`
+            SELECT MAX(date) AS lastUpdate
+            FROM activity
+            WHERE goal_id = ?
+        `, [goalId]);
+
+        if (!result || !result.lastUpdate) {
+            return res.status(404).json({ message: 'Дані не знайдено' });
+        }
+
+        res.json({ lastUpdate: result.lastUpdate });
+    } catch (error) {
+        console.error('Помилка отримання останньої дати оновлення:', error);
+        res.status(500).json({ message: 'Помилка сервера' });
+    }
+}
 
 async function getActivityGraph(req, res) {
     try {
@@ -315,16 +350,55 @@ async function getUserData(req, res) {
 }
 
 
+
+async function switchToNextGoal(req, res) {
+    try {
+        const { currentGoalId } = req.body;
+
+        // Отримуємо всі цілі користувача впорядковані за датою створення
+        const goals = await db.query(`
+            SELECT id FROM goals
+            WHERE user_id = (SELECT user_id FROM goals WHERE id = ?)
+            ORDER BY created_at ASC
+        `, [currentGoalId]);
+
+        if (!goals.length) {
+            return res.status(404).json({ message: 'Цілі не знайдено' });
+        }
+
+        // Знаходимо поточний індекс активної цілі
+        const currentIndex = goals.findIndex(goal => goal.id === currentGoalId);
+        
+        // Обчислюємо наступний індекс (за круговим принципом)
+        const nextIndex = (currentIndex + 1) % goals.length;
+        const nextGoalId = goals[nextIndex].id;
+
+        // Оновлюємо статуси
+        await db.query(`UPDATE goals SET status = 'pending' WHERE id = ?`, [currentGoalId]);
+        await db.query(`UPDATE goals SET status = 'active' WHERE id = ?`, [nextGoalId]);
+
+        res.json({ message: 'Ціль оновлено', nextGoalId });
+    } catch (error) {
+        console.error('Помилка при перемиканні цілі:', error);
+        res.status(500).json({ message: 'Помилка сервера' });
+    }
+}
+
+
+
 module.exports = {
     getActiveGoals,
     getReminders,
     getActivityGraph,
     createGoal,
+    getLastUpdateForGoal,
     addGoal,
     generateTasks,
+    getAllGoals,
     saveTasks,
     getUserData,
 	getTotalTimeForGoal, // Переконайтеся, що ця функція є тут
 	getTotalProgressForGoal,
+    switchToNextGoal,
     getActivityData
 };

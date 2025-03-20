@@ -1,0 +1,154 @@
+/* Основний контейнер */
+.add-goal-container {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: #e9f7ef;
+	border-radius: 10px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	font-family: Arial, sans-serif;
+  }
+  
+  /* Заголовок */
+  .add-goal-container h2 {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 20px;
+	text-align: center;
+	color: #333333;
+  }
+  
+  /* Поля вводу */
+  .add-goal-container input,
+  .add-goal-container textarea {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 15px;
+	border: 1px solid #cccccc;
+	border-radius: 5px;
+	font-size: 16px;
+	box-sizing: border-box;
+  }
+  
+  .add-goal-container textarea {
+	resize: none;
+	height: 100px;
+  }
+  
+  /* Метки */
+  .add-goal-container label {
+	font-weight: bold;
+	margin-bottom: 5px;
+	display: block;
+	color: #555555;
+  }
+  
+  /* Контейнер для дат */
+  .date-container {
+	display: flex;
+	justify-content: space-between;
+  }
+  
+  /* Кнопки */
+  .add-goal-container button {
+	display: inline-block;
+	padding: 10px 20px;
+	font-size: 16px;
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #28a745;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	margin-top: 10px;
+  }
+  
+  .add-goal-container button:hover {
+	background-color: #218838;
+  }
+  
+  .add-goal-container button:disabled {
+	background-color: #cccccc;
+	cursor: not-allowed;
+  }
+  
+  /* Кнопка видалення підзадачі */
+  .add-goal-container .remove-subtask {
+	color: #ff4d4d;
+	font-size: 18px;
+	margin-left: 10px;
+	cursor: pointer;
+	transition: color 0.3s ease;
+	background: none;
+	border: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .add-goal-container .remove-subtask:hover {
+	color: #cc0000;
+  }
+  
+  /* Список підзадач */
+  .add-goal-container .subtasks-container {
+	margin-top: 20px;
+  }
+  
+  .add-goal-container .subtasks-container h3 {
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: #333333;
+  }
+  
+  .add-goal-container .subtasks-container .subtask {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+  }
+  
+  .add-goal-container .subtasks-container .subtask textarea {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #cccccc;
+	border-radius: 5px;
+	font-size: 16px;
+	height: auto; /* Дозволяє текстовому полю збільшуватися вниз */
+	overflow: hidden;
+	white-space: pre-wrap; /* Дозволяє переносити текст на новий рядок */
+	resize: none; /* Забороняємо ручне змінення розміру */
+	min-height: 40px;
+  }
+  
+  /* Стиль для згенерованої цілі */
+  .generated-goal {
+	background-color: #d4edda;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	margin-top: 20px;
+  }
+  
+  .goal-title-container,
+  .goal-period-container {
+	background-color: #c3e6cb;
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 15px;
+	text-align: center;
+  }
+  
+  .generated-goal h3 {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: #333333;
+  }
+  
+  .generated-goal p {
+	font-size: 16px;
+	color: #555555;
+	margin-bottom: 10px;
+  }

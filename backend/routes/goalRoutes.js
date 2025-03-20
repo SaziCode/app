@@ -16,16 +16,42 @@ const {
     saveTasks,
     getUserData,
 	getTotalProgressForGoal,
-    getActivityData
+    switchToNextGoal,
+    getLastUpdateForGoal,
+    getActivityData,
+    getAllGoals
 } = require('../controllers/goalController');
 
+// Приклад даних сповіщень
 
+  
+router.get('/notifications', verifyToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Логика для подсчета количества уведомлений
+        const [notifications] = await query(
+            `SELECT COUNT(*) AS count
+             FROM notifications
+             WHERE user_id = ? AND is_read = 0`,
+            [userId]
+        );
+
+        res.json({ count: notifications.count });
+    } catch (error) {
+        console.error("Ошибка при получении уведомлений:", error);
+        res.status(500).json({ message: "Ошибка сервера" });
+    }
+});
+
+router.get('/goals/last-update', verifyToken, getLastUpdateForGoal);
+router.post('/goals/switch', verifyToken, switchToNextGoal);
 router.get('/goals/:goalId/total-time', verifyToken, getTotalTimeForGoal);
 router.get('/goals/:goalId/total-progress', verifyToken, getTotalProgressForGoal);
 // Захищені маршрути
 router.get('/active-goals', verifyToken, getActiveGoals);
 router.get('/reminders', verifyToken, getReminders);
-
+router.get('/goals', verifyToken, getAllGoals);
 router.post('/create-goal', verifyToken, createGoal);
 router.post('/save-tasks', verifyToken, saveTasks);
 router.get('/user', verifyToken, getUserData);

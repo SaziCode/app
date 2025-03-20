@@ -10,30 +10,69 @@ const Dashboard = () => {
     const [lastUpdate, setLastUpdate] = useState('тиждень тому');
 	const [totalTime, setTotalTime] = useState(0); // Початковий стан для збереження загального часу
 	useEffect(() => {
-		// Отримання даних активності
-		axios.get('http://localhost:3000/api/activity-data', {
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`,
-			},
-		})
-		.then((response) => {
-			const formattedData = response.data.map((data, index, array) => {
-				if (index === 0) {
-					return { ...data, progress_difference: null }; // Перший місяць без різниці
-				} else {
-					const previous = array[index - 1];
-					return {
-						...data,
-						progress_difference: data.total_progress - previous.total_progress,
-					};
-				}
+
+
+
+		if (goal.id) {
+			// Отримання останньої дати оновлення
+			axios.get('http://localhost:3000/api/goals/last-update', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+				params: { goalId: goal.id }, // Передаємо ID активної цілі
+			})
+			.then((response) => {
+				const lastUpdateDate = new Date(response.data.last_update);
+				setLastUpdate(lastUpdateDate.toLocaleDateString()); // Форматуємо дату
+			})
+			.catch((error) => {
+				console.error('Помилка при отриманні останньої дати оновлення:', error);
 			});
-			setActivityData(formattedData);
-		})
-		.catch((error) => {
-			console.error('Помилка при отриманні даних активності:', error);
-		});
-	
+		}
+		// Отримання даних активності
+
+		// Отримання загального часу для мети
+		
+		if (goal.id) {
+			axios.get(`http://localhost:3000/api/goals/${goal.id}/total-time`, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			})
+			.then((response) => {
+				setTotalTime(Number(response.data.total_hours)); // Встановлюємо загальну суму
+			})
+			.catch((error) => {
+				console.error('Помилка при отриманні загального часу для мети:', error);
+			});
+
+
+		if (goal.id) {
+			// Отримання даних активності для нової активної цілі
+			axios.get('http://localhost:3000/api/activity-data', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+				params: { goalId: goal.id }, // Передаємо ID активної цілі
+			})
+			.then((response) => {
+				const formattedData = response.data.map((data, index, array) => {
+					if (index === 0) {
+						return { ...data, progress_difference: data.total_progress }; // Перший місяць: використовуємо total_progress
+					} else {
+						const previous = array[index - 1];
+						return {
+							...data,
+							progress_difference: data.total_progress - previous.total_progress,
+						};
+					}
+				});
+				setActivityData(formattedData); // Оновлюємо графік
+			})
+			.catch((error) => {
+				console.error('Помилка при отриманні даних активності:', error);
+			});
+		}
 		// Отримання даних цілі
 		axios.get('http://localhost:3000/api/goals', {
 			headers: {
@@ -51,35 +90,146 @@ const Dashboard = () => {
 			console.error('Помилка при отриманні даних цілі:', error);
 		});
 	
-		// Отримання загального часу для мети
-		if (goal.id) {
-			axios.get(`http://localhost:3000/api/goals/${goal.id}/total-time`, {
+			const handleSwitchGoal = () => {
+		axios.post('http://localhost:3000/api/goals/switch', 
+			{ currentGoalId: goal.id }, 
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}
+		)
+		.then((response) => {
+			console.log('Ціль оновлено:', response.data);
+	
+			// Оновлюємо поточну ціль
+			axios.get('http://localhost:3000/api/goals', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			})
 			.then((response) => {
-				setTotalTime(Number(response.data.total_hours)); // Встановлюємо загальну суму
+				if (Array.isArray(response.data) && response.data.length > 0) {
+					const activeGoal = response.data.find((g) => g.status === 'active');
+					setGoal(activeGoal || {}); // Встановлюємо нову активну ціль
+	
+					// Оновлюємо дані активності для нової цілі
+					axios.get('http://localhost:3000/api/activity-data', {
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+					})
+					.then((response) => {
+						const formattedData = response.data.map((data, index, array) => {
+							if (index === 0) {
+								return { ...data, progress_difference: null }; // Перший місяць без різниці
+							} else {
+								const previous = array[index - 1];
+								return {
+									...data,
+									progress_difference: data.total_progress - previous.total_progress,
+								};
+							}
+						});
+						setActivityData(formattedData); // Оновлюємо графік
+					})
+					.catch((error) => {
+						console.error('Помилка при отриманні даних активності:', error);
+					});
+				} else {
+					console.error('Цілі не знайдено');
+				}
 			})
 			.catch((error) => {
-				console.error('Помилка при отриманні загального часу для мети:', error);
+				console.error('Помилка при отриманні даних цілі:', error);
 			});
-		}
+		})
+		.catch((error) => {
+			console.error('Помилка при перемиканні цілі:', error);
+		});
+	};
+	
 
-		if (goal.id) {
-			axios.get(`http://localhost:3000/api/goals/${goal.id}/total-time`, {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem('token')}`,
-				},
-			})
-			.then((response) => {
-				setTotalTime(Number(response.data.total_hours)); // Встановлюємо загальну суму
-			})
-			.catch((error) => {
-				console.error('Помилка при отриманні загального часу для мети:', error);
-			});
+    const handleMonthClick = (month) => {
+        const currentMonthData = activityData.find((data) => data.month === month);
+        const previousMonthData = activityData.find((data) => data.month === month - 1);
+
+        if (currentMonthData && previousMonthData) {
+            setComparisonData({
+                current: currentMonthData,
+                previous: previousMonthData,
+                difference: currentMonthData.total_progress - previousMonthData.total_progress,
+            });
+        } else {
+            setComparisonData(null);
+        }
+        setSelectedMonth(month);
+    };
+	
 		}
 	}, [goal.id]); // Виконуємо запит, коли змінюється `goal.id`
+
+
+	const handleSwitchGoal = () => {
+		axios.post('http://localhost:3000/api/goals/switch', 
+			{ currentGoalId: goal.id }, 
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}
+		)
+		.then((response) => {
+			console.log('Ціль оновлено:', response.data);
+	
+			// Оновлюємо поточну ціль
+			axios.get('http://localhost:3000/api/goals', {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			})
+			.then((response) => {
+				if (Array.isArray(response.data) && response.data.length > 0) {
+					const activeGoal = response.data.find((g) => g.status === 'active');
+					setGoal(activeGoal || {}); // Встановлюємо нову активну ціль
+	
+					// Оновлюємо дані активності для нової цілі
+					axios.get('http://localhost:3000/api/activity-data', {
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+						params: { goalId: activeGoal.id }, // Передаємо ID нової активної цілі
+					})
+					.then((response) => {
+						const formattedData = response.data.map((data, index, array) => {
+							if (index === 0) {
+								return { ...data, progress_difference: null }; // Перший місяць без різниці
+							} else {
+								const previous = array[index - 1];
+								return {
+									...data,
+									progress_difference: data.total_progress - previous.total_progress,
+								};
+							}
+						});
+						setActivityData(formattedData); // Оновлюємо графік
+					})
+					.catch((error) => {
+						console.error('Помилка при отриманні даних активності:', error);
+					});
+				} else {
+					console.error('Цілі не знайдено');
+				}
+			})
+			.catch((error) => {
+				console.error('Помилка при отриманні даних цілі:', error);
+			});
+		})
+		.catch((error) => {
+			console.error('Помилка при перемиканні цілі:', error);
+		});
+	};
+	
 
     const handleMonthClick = (month) => {
         const currentMonthData = activityData.find((data) => data.month === month);
@@ -102,7 +252,10 @@ const Dashboard = () => {
 
     return (
         <div className="container">
-            <p className="date">Сьогодні: {new Date().toLocaleDateString()}</p>
+			
+			<p className="date">Сьогодні: {new Date().toLocaleDateString()}</p>
+			
+            
             <div className="goal-container">
                 <div className="goal-details">
                     <div className="goal-card">
@@ -113,17 +266,19 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className="progress-container">
-                        <div className="progress-bar-wrapper">
+                        <div className="goal-card">
                             <span className="progress-label">Прогрес</span>
                             <div className="progress-bar">
                                 <div className="progress-bar-fill"style={{ width: `${goal.progress || 0}%` }}></div>
                             </div>
                         </div>
                         <div className="progress-details">
-                            <span>⏳ Витрачено часу: {totalTime.toLocaleString()}ч</span>
-                            <span>📅 Активний місяць: {new Date().toLocaleString('default', { month: 'short' })}</span>
+                            <span className="goal-card">⏳ Витрачено часу: {totalTime.toLocaleString()}ч</span>
+                            <span className="goal-card">📅 Активний місяць: {new Date().toLocaleString('default', { month: 'short' })}</span>
                         </div>
-                        <button className="button">Перейти до наступної цілі</button>
+                        <button className="button" onClick={handleSwitchGoal}>
+    						Перейти до наступної цілі
+						</button>
                     </div>
                 </div>
             </div>
@@ -141,7 +296,7 @@ const Dashboard = () => {
                   	 		 	}}
          			       >
                  			   {selectedMonth === data.month && (
-                    		   		<span className="bar-label">{data.progress_difference}%</span>
+                    		   		<span className="bar-label">  {data.progress_difference !== null ? `${data.progress_difference}%` : '0%'}</span>
                     			)}
                				 </div>
               				  {/* Відображення місяця під стовпчиком */}
@@ -153,10 +308,13 @@ const Dashboard = () => {
     				</div>
 			</div>
 
-            <div className="update-reminder">
+<div className="goal-card">
+<div className="update-reminder" >
                 <p>Не забудьте оновити дані своїх цілей!</p>
                 <p className="last-update">Останнє оновлення: {lastUpdate}</p>
             </div>
+</div>
+            
 
             <div className="footer">
                 <button className="footer-button">⚙</button>

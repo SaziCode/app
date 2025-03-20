@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import '../components/Auth.css';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -35,42 +36,44 @@ const Register = () => {
     };
 
     return (
-        <div>
-            <h2>Реєстрація</h2>
-            <form onSubmit={handleRegister}>
-                <div>
-                    <label htmlFor="name">Ім'я:</label>
-                    <input
-                        type="text"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Пароль:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <button type="submit">Зареєструватися</button>
-            </form>
-            <p>
-                Маєш профіль? <Link to="/login">Увійти</Link>
-            </p>
-        </div>
+        <div className="auth-container">
+    <div className="auth-card">
+        <h2>Реєстрація</h2>
+        <form onSubmit={handleRegister}>
+            <div>
+                <label htmlFor="name">Ім'я:</label>
+                <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="email">Email:</label>
+                <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="password">Пароль:</label>
+                <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </div>
+            <button type="submit">Зареєструватися</button>
+        </form>
+        <p>
+            Маєш профіль? <Link to="/login">Увійти</Link>
+        </p>
+    </div>
+</div>
     );
 };
 

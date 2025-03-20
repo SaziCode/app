@@ -8,6 +8,15 @@
     font-family: Arial, sans-serif;
 }
 
+.card-container {
+    border: 1px solid #ccc; /* Сіра рамка */
+    border-radius: 8px; /* Закруглені кути */
+    padding: 16px; /* Відступи всередині */
+    margin-bottom: 16px; /* Відступ між елементами */
+    background-color: #fff; /* Білий фон */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легка тінь */
+}
+
 .date {
     text-align: center;
     margin-bottom: 20px;

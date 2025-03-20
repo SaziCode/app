@@ -1,0 +1,111 @@
+/* Основний контейнер */
+.goals-container {
+	background-color: #e9f7ef;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+  }
+  
+  /* Заголовок */
+  .header {
+	text-align: center;
+	margin-bottom: 20px;
+  }
+  
+  .header h1 {
+	font-size: 24px;
+	color: #333;
+  }
+  
+  .header p {
+	font-size: 16px;
+	color: #666;
+  }
+  
+  .notification-icon {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background-color: #ff6f61;
+	color: #fff;
+	padding: 5px 10px;
+	border-radius: 50px;
+	font-size: 14px;
+  }
+  
+  /* Контейнер для рядка цілі */
+  .goal-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px; /* Відступ між контейнерами */
+  }
+  
+  /* Стиль картки цілі */
+  .goal-card {
+	background-color: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 20px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	flex: 1; /* Однаковий розмір для обох блоків */
+  }
+  
+  /* Окремий стиль для блоку з інформацією */
+  .goal-info-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+  }
+  
+  .goal-tags {
+	font-size: 14px;
+	color: #666;
+  }
+  
+/* Нижня панель навігації */
+.footer {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	padding: 10px 0;
+	background-color: #fff;
+	border-top: 1px solid #e0e0e0;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	box-sizing: border-box; /* Враховує padding у ширині */
+  }
+  
+  .footer-button,
+  .footer-add-button {
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	padding: 10px;
+	flex: 1; /* Кнопки займають однакову ширину */
+	text-align: center;
+  }
+  
+  .footer-add-button {
+	font-size: 30px;
+	color: #28a745;
+  }
+  
+  /* Адаптивність для телефону */
+  @media (max-width: 480px) {
+	.footer {
+	  flex-direction: row; /* Кнопки залишаються в рядок */
+	  gap: 5px; /* Невеликий відступ між кнопками */
+	}
+  
+	.footer-button,
+	.footer-add-button {
+	  flex: 1; /* Кнопки розтягуються рівномірно */
+	  width: auto; /* Ширина кнопок залежить від контейнера */
+	}
+  }

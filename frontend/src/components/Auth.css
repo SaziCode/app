@@ -1,0 +1,108 @@
+/* Основний контейнер для сторінок */
+.auth-container {
+    background-color: #e9f7ef; /* Світло-зелений фон */
+    min-height: 100vh; /* Мінімальна висота для заповнення екрану */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Карта для форми */
+.auth-card {
+    background-color: #ffffff; /* Білий фон */
+    border: 1px solid #e0e0e0; /* Світло-сіра рамка */
+    border-radius: 8px; /* Закруглені кути */
+    padding: 20px; /* Відступи всередині */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легка тінь */
+    width: 100%;
+    max-width: 400px; /* Максимальна ширина */
+}
+
+/* Заголовок */
+.auth-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333333; /* Темно-сірий текст */
+    font-size: 24px;
+}
+
+/* Поля вводу */
+.auth-card input {
+    width: 100%; /* Ширина 100% */
+    padding: 12px; /* Внутрішні відступи з усіх боків */
+    margin-bottom: 15px;
+    border: 1px solid #d6d6d6; /* Світло-сіра рамка */
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #f9f9f9; /* Світлий фон для полів */
+    color: #333333; /* Темно-сірий текст */
+    box-sizing: border-box; /* Включає padding у ширину */
+}
+
+.auth-card input:focus {
+    border-color: #0078d4; /* Синій колір при фокусі */
+    outline: none;
+    background-color: #ffffff; /* Білий фон при фокусі */
+}
+
+/* Кнопка */
+.auth-card button {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745; /* Зелений фон */
+    color: #ffffff; /* Білий текст */
+    border: none; /* Без обводки */
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.auth-card button:hover {
+    background-color: #218838; /* Темніший зелений при наведенні */
+    transform: scale(1.02); /* Легке збільшення при наведенні */
+}
+
+.auth-card button:disabled {
+    background-color: #cccccc; /* Сірий фон для неактивної кнопки */
+    cursor: not-allowed;
+}
+
+/* Повідомлення */
+.auth-card p {
+    text-align: center;
+    margin-top: 10px;
+    color: #666666; /* Світло-сірий текст */
+    font-size: 14px;
+}
+
+/* Посилання */
+.auth-card a {
+    color: #0078d4; /* Синій текст */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-card a:hover {
+    text-decoration: underline;
+}
+
+/* Адаптивність */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 15px;
+    }
+
+    .auth-card h2 {
+        font-size: 20px;
+    }
+
+    .auth-card input {
+        font-size: 14px;
+    }
+
+    .auth-card button {
+        font-size: 14px;
+    }
+}

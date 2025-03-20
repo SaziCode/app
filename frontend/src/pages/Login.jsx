@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // для перенаправлення
-
+import '../components/Auth.css';
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [message, setMessage] = useState('');
@@ -38,33 +38,36 @@ const Login = () => {
     };
 
     return (
-        <div>
-            <h2>Вхід</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    onChange={handleChange}
-                    value={formData.email}
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Пароль"
-                    onChange={handleChange}
-                    value={formData.password}
-                    required
-                />
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Завантаження...' : 'Увійти'}
-                </button>
-            </form>
-            {message && <p>{message}</p>}
-
-            <p>Не має акаунта? <a href="/register">Зареєструватись</a></p> {/* Посилання на сторінку реєстрації */}
-        </div>
+        <div className="auth-container">
+    <div className="auth-card">
+        <h2>Вхід</h2>
+        <form onSubmit={handleSubmit}>
+            <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                onChange={handleChange}
+                value={formData.email}
+                required
+            />
+            <input
+                type="password"
+                name="password"
+                placeholder="Пароль"
+                onChange={handleChange}
+                value={formData.password}
+                required
+            />
+            <button type="submit" disabled={loading}>
+                {loading ? 'Завантаження...' : 'Увійти'}
+            </button>
+        </form>
+        {message && <p>{message}</p>}
+        <p>
+            Не має акаунта? <a href="/register">Зареєструватись</a>
+        </p>
+    </div>
+</div>
     );
 };
 

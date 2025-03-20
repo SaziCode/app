@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import '../components/AddGoal.css'; // Переконайтеся, що шлях правильний
 
 const AddGoal = () => {
   const [title, setTitle] = useState('');
@@ -87,72 +88,83 @@ const AddGoal = () => {
     }
   };
 
+  const adjustTextareaHeight = (textarea) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  };
+
+  useEffect(() => {
+    const textareas = document.querySelectorAll('.subtask textarea');
+    textareas.forEach(textarea => adjustTextareaHeight(textarea));
+  }, [subtasks]);
+
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Додати нову ціль</h2>
+    <div className="add-goal-container">
+      <h2>Додавання нових цілей</h2>
       
       <input
         type="text"
         placeholder="Назва цілі"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="w-full p-2 border rounded mb-2"
       />
       
+      <div className="date-container">
+        <div>
+          <label>Дата початку:</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Дедлайн:</label>
+          <input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
+        </div>
+      </div>
+
       <textarea
         placeholder="Опис цілі"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="w-full p-2 border rounded mb-2"
       />
 
-      <label className="block font-medium">Дата початку:</label>
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        className="w-full p-2 border rounded mb-2"
-      />
-
-      <label className="block font-medium">Дедлайн:</label>
-      <input
-        type="date"
-        value={deadline}
-        onChange={(e) => setDeadline(e.target.value)}
-        className="w-full p-2 border rounded mb-4"
-      />
-
-      <button
-        onClick={generateSubtasks}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        disabled={loading}
-      >
+      <button onClick={generateSubtasks} disabled={loading}>
         {loading ? "Генеруємо..." : "Згенерувати підзадачі"}
       </button>
 
       {subtasks.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-lg font-bold mb-2">Підзадачі:</h3>
-          {subtasks.map((task, index) => (
-            <div key={index} className="flex items-center mb-2">
-              <input
-                type="text"
-                value={task}
-                onChange={(e) => handleSubtaskChange(index, e.target.value)}
-                className="w-full p-2 border rounded"
-              />
-              <button onClick={() => removeSubtask(index)} className="ml-2 text-red-500">✖</button>
-            </div>
-          ))}
+        <div className="generated-goal">
+          <div className="goal-title-container">
+            <h3>Ціль: {title}</h3>
+          </div>
+          <div className="goal-period-container">
+            <p>Обраний період часу: {startDate} - {deadline}</p>
+          </div>
+          <div className="subtasks-container">
+            <h3>Підзадачі:</h3>
+            {subtasks.map((task, index) => (
+              <div key={index} className="subtask">
+                <textarea
+                  value={task}
+                  onChange={(e) => handleSubtaskChange(index, e.target.value)}
+                  rows={1}
+                  onInput={(e) => adjustTextareaHeight(e.target)}
+                />
+                <button className="remove-subtask" onClick={() => removeSubtask(index)}>✖</button>
+              </div>
+            ))}
+          </div>
+          <button onClick={saveGoal}>
+            Зберегти
+          </button>
         </div>
       )}
-
-      <button
-        onClick={saveGoal}
-        className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-      >
-        Зберегти
-      </button>
     </div>
   );
 };
