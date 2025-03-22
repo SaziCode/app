@@ -1,5 +1,66 @@
-/* Основний контейнер */
-.add-goal-container {
+/* Футер */
+.footer {
+	position: fixed;
+	bottom: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	max-width: 400px;
+	width: 100%;
+	background-color: #ffffff;
+	padding: 10px;
+	border-radius: 50px;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .footer-button,
+  .footer-add-button {
+	color: #6b7280;
+	font-size: 24px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .footer-button {
+	background: transparent;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .footer-add-button {
+	background-color: #22c55e;
+	color: #ffffff;
+	padding: 15px;
+	border-radius: 50%;
+	width: 80px;
+	height: 80px;
+	font-size: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .footer-button:hover,
+  .footer-add-button:hover {
+	color: #15803d;
+  }
+  
+  .footer-button:active,
+  .footer-add-button:active {
+	transform: scale(0.95);
+  }
+  
+  /* Основний контейнер */
+  .add-goal-container {
 	max-width: 600px;
 	margin: 0 auto;
 	padding: 20px;
@@ -115,40 +176,10 @@
 	border: 1px solid #cccccc;
 	border-radius: 5px;
 	font-size: 16px;
-	height: auto; /* Дозволяє текстовому полю збільшуватися вниз */
+	height: auto;
 	overflow: hidden;
-	white-space: pre-wrap; /* Дозволяє переносити текст на новий рядок */
-	resize: none; /* Забороняємо ручне змінення розміру */
+	white-space: pre-wrap;
+	resize: none;
 	min-height: 40px;
   }
   
-  /* Стиль для згенерованої цілі */
-  .generated-goal {
-	background-color: #d4edda;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	margin-top: 20px;
-  }
-  
-  .goal-title-container,
-  .goal-period-container {
-	background-color: #c3e6cb;
-	padding: 10px;
-	border-radius: 5px;
-	margin-bottom: 15px;
-	text-align: center;
-  }
-  
-  .generated-goal h3 {
-	font-size: 20px;
-	font-weight: bold;
-	margin-bottom: 10px;
-	color: #333333;
-  }
-  
-  .generated-goal p {
-	font-size: 16px;
-	color: #555555;
-	margin-bottom: 10px;
-  }

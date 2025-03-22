@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const { query } = require("../models/db");
 const axios = require("axios");
-
+getLastUpdateForGoal
 async function getAllGoals(req, res) {
     try {
       const userId = req.user.id; // Отримуємо ID користувача з токена
@@ -51,30 +51,77 @@ async function getActiveGoals(req, res) {
     }
 }
 
+
+
 async function getTotalTimeForGoal(req, res) {
     try {
-        const { goalId } = req.params;
-
-        const [result] = await db.query(`
-            SELECT COALESCE(SUM(hours), 0) AS totalTime
-            FROM activity
-            WHERE goal_id = ?
-        `, [goalId]);
-
-        if (!result) {
-            return res.status(404).json({ message: 'Дані не знайдено' });
-        }
-
-        res.json({ totalTime: Number(result.totalTime) }); // Повертаємо totalTime як число
+      const { goalId } = req.params;
+  
+      if (!goalId) {
+        return res.status(400).json({ message: 'goalId is required' });
+      }
+  
+      const [result] = await db.query(
+        `
+        SELECT COALESCE(SUM(hours), 0) AS totalTime
+        FROM activity
+        WHERE goal_id = ?
+      `,
+        [goalId]
+      );
+  
+      if (!result || result.totalTime === null) {
+        return res.status(404).json({ message: 'Дані не знайдено', totalTime: 0 });
+      }
+  
+      res.json({ totalTime: Number(result.totalTime) }); // Повертаємо totalTime як число
     } catch (error) {
-        console.error("Помилка отримання загального часу для мети:", error);
-        res.status(500).json({ message: "Помилка сервера" });
+      console.error("Помилка отримання загального часу для мети:", error);
+      res.status(500).json({ message: "Помилка сервера" });
     }
+  }
+
+
+
+async function getTasksForGoal(req, res) {
+  try {
+    const { goalId } = req.params;
+
+    const tasks = await db.query(
+      `
+      SELECT id, description, completion_date AS completed
+      FROM tasks
+      WHERE goal_id = ?
+    `,
+      [goalId]
+    );
+
+    const [goal] = await db.query(
+      `
+      SELECT title, user_id
+      FROM goals
+      WHERE id = ?
+    `,
+      [goalId]
+    );
+
+    if (!goal) {
+      return res.status(404).json({ message: "Ціль не знайдено" });
+    }
+
+    res.json({
+      tasks: tasks.map((task) => ({
+        ...task,
+        completed: !!task.completed, // Перетворюємо completion_date на булеве значення
+      })),
+      goalTitle: goal.title,
+      userId: goal.user_id,
+    });
+  } catch (error) {
+    console.error("Помилка отримання завдань для цілі:", error);
+    res.status(500).json({ message: "Помилка сервера" });
+  }
 }
-
-
-
-
 
 // Отримання нагадувань
 async function getReminders(req, res) {
@@ -151,24 +198,31 @@ async function getTotalProgressForGoal(req, res) {
 
 async function getLastUpdateForGoal(req, res) {
     try {
-        const { goalId } = req.query;
-
-        const [result] = await db.query(`
-            SELECT MAX(date) AS lastUpdate
-            FROM activity
-            WHERE goal_id = ?
-        `, [goalId]);
-
-        if (!result || !result.lastUpdate) {
-            return res.status(404).json({ message: 'Дані не знайдено' });
-        }
-
-        res.json({ lastUpdate: result.lastUpdate });
+      const { goalId } = req.query;
+  
+      if (!goalId) {
+        return res.status(400).json({ message: "goalId is required" });
+      }
+  
+      const [result] = await db.query(
+        `
+        SELECT MAX(date) AS lastUpdate
+        FROM activity
+        WHERE goal_id = ?
+      `,
+        [goalId]
+      );
+  
+      if (!result || !result.lastUpdate) {
+        return res.status(404).json({ message: "Дані не знайдено" });
+      }
+  
+      res.json({ lastUpdate: result.lastUpdate });
     } catch (error) {
-        console.error('Помилка отримання останньої дати оновлення:', error);
-        res.status(500).json({ message: 'Помилка сервера' });
+      console.error("Помилка отримання останньої дати оновлення:", error);
+      res.status(500).json({ message: "Помилка сервера" });
     }
-}
+  }
 
 async function getActivityGraph(req, res) {
     try {

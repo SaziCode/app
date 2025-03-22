@@ -1,0 +1,193 @@
+/* Загальний контейнер */
+/* Загальний контейнер */
+.container {
+	min-height: 100vh;
+	background-color: #e8f5e9; /* Світло-зелений фон */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px;
+	font-family: Arial, sans-serif;
+	box-sizing: border-box;
+	padding-bottom: 80px; /* Додаємо відступ знизу, щоб уникнути перекриття футером */
+  }
+  
+  /* Заголовок */
+  .header {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 20px;
+	text-align: center;
+	color: #1f2937;
+  }
+  
+  /* Список завдань */
+  .tasks-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: 100%;
+	max-width: 400px; /* Обмеження ширини для мобільних пристроїв */
+  }
+  
+  /* Окремий елемент завдання */
+  .task-item {
+	display: flex;
+	flex-direction: column; /* Вертикальне розташування для мобільних пристроїв */
+	gap: 10px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #f9f9f9;
+	transition: background-color 0.3s ease;
+  }
+  
+  .task-item:hover {
+	background-color: #f1f1f1;
+  }
+  
+  /* Текст завдання */
+  .task-item p {
+	margin: 0;
+	font-size: 16px;
+	color: #555;
+  }
+  
+  /* Поле для введення годин */
+  .task-item input {
+	width: 100%; /* Розтягується на всю ширину */
+	max-width: 80px; /* Максимальна ширина */
+	padding: 5px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	text-align: center;
+	box-sizing: border-box;
+  }
+  
+  /* Кнопка завершення завдання */
+  .complete-button {
+	border: none;
+	background: none;
+	font-size: 18px;
+	color: #22c55e; /* Зелений колір */
+	cursor: pointer;
+	transition: color 0.3s ease;
+	align-self: flex-end; /* Вирівнювання кнопки праворуч */
+  }
+  
+  .complete-button:hover {
+	color: #15803d; /* Темно-зелений колір */
+  }
+  
+  .complete-button.completed {
+	color: green;
+	cursor: default;
+  }
+  
+  /* Кнопка повернення */
+  .button {
+	background-color: #22c55e;
+	color: #ffffff;
+	font-size: 16px;
+	padding: 10px 20px;
+	border-radius: 5px;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	margin-top: 20px;
+	width: 100%; /* Розтягується на всю ширину */
+	max-width: 400px; /* Обмеження ширини для мобільних пристроїв */
+  }
+  
+  /* Вирівнювання кнопки "Перейти до наступної цілі" по центру */
+.button {
+	background-color: #22c55e;
+	color: #ffffff;
+	font-size: 16px;
+	padding: 10px 20px;
+	border-radius: 5px;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	margin: 20px auto; /* Центрування кнопки */
+	display: block; /* Робимо кнопку блочним елементом */
+	max-width: 200px; /* Обмеження ширини кнопки */
+  }
+  
+  
+  
+  /* Футер */
+  .footer {
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%); /* Центрування футера */
+	max-width: 400px;
+	width: 100%;
+	background-color: #ffffff;
+	padding: 10px;
+	border-radius: 20px;
+	display: flex;
+	justify-content: space-around;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .footer-button,
+  .footer-add-button {
+	color: #6b7280;
+	font-size: 18px;
+	background: none;
+	border: none;
+	cursor: pointer;
+  }
+  
+  .footer-add-button {
+	background-color: #22c55e;
+	color: #ffffff;
+	padding: 10px;
+	border-radius: 50%;
+  }
+  
+  .footer-button:hover,
+  .footer-add-button:hover {
+	color: #15803d;
+  }
+  .button:hover {
+	background-color: #15803d;
+  }
+  
+  /* Адаптивність для мобільних пристроїв */
+  @media (max-width: 768px) {
+	.header {
+	  font-size: 18px;
+	}
+  
+	.tasks-list {
+	  max-width: 100%; /* Використовує всю ширину екрану */
+	}
+  
+	.task-item {
+	  padding: 8px;
+	}
+  
+	.task-item p {
+	  font-size: 14px;
+	}
+  
+	.task-item input {
+	  font-size: 12px;
+	  max-width: 100%; /* Розтягується на всю ширину */
+	}
+  
+	.complete-button {
+	  font-size: 16px;
+	}
+  
+	.button {
+	  font-size: 14px;
+	  padding: 8px 16px;
+	}
+  }

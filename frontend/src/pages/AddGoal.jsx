@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../components/AddGoal.css'; // Переконайтеся, що шлях правильний
+import '../components/AddGoal.css';
 
 const AddGoal = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -53,7 +55,7 @@ const AddGoal = () => {
     }
 
     try {
-      const userId = Math.floor(Math.random() * 4) + 1; // Рандомне id користувача
+      const userId = Math.floor(Math.random() * 4) + 1;
 
       const goalResponse = await axios.post("http://localhost:3000/api/goals", {
         user_id: userId,
@@ -69,7 +71,7 @@ const AddGoal = () => {
       const goalId = goalResponse.data.goalId;
       setGoalId(goalId);
 
-      if (subtasks.length > 0) {
+      if (subtasks.length > 0 && goalId) {
         await axios.post("http://localhost:3000/api/tasks", {
           goalId,
           tasks: subtasks
@@ -94,8 +96,7 @@ const AddGoal = () => {
   };
 
   useEffect(() => {
-    const textareas = document.querySelectorAll('.subtask textarea');
-    textareas.forEach(textarea => adjustTextareaHeight(textarea));
+    document.querySelectorAll('.subtask textarea').forEach(textarea => adjustTextareaHeight(textarea));
   }, [subtasks]);
 
   return (
@@ -137,6 +138,9 @@ const AddGoal = () => {
       <button onClick={generateSubtasks} disabled={loading}>
         {loading ? "Генеруємо..." : "Згенерувати підзадачі"}
       </button>
+      <button  onClick={() => navigate("/")}>
+        Повернутися до списку цілей
+      </button>
 
       {subtasks.length > 0 && (
         <div className="generated-goal">
@@ -160,11 +164,11 @@ const AddGoal = () => {
               </div>
             ))}
           </div>
-          <button onClick={saveGoal}>
-            Зберегти
-          </button>
+          <button onClick={saveGoal}>Зберегти</button>
         </div>
       )}
+
+     
     </div>
   );
 };
